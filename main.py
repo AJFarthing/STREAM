@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
+import requests
 import lightgbm as lgb
 import pickle
 
 header = st.container()
+url = "https://github.com/AJFarthing/STREAM/raw/main/lgb_model.pkl"
+response = requests.get(url)
 
 
 with header:
@@ -40,9 +43,14 @@ input_df = user_input_features()
 st.write(input_df)
 
 
-load_clf = pickle.load(open('/Users/alistair/Desktop/STREAM/lgb_model.pkl', 'rb'))
+# Check if the request was successful
+if response.status_code == 200:
+    # Load the pickle file from the response content
+    load_clf = pickle.loads(response.content)
+else:
+    # Handle the case when the request fails
+    print("Failed to fetch the pickle file from GitHub.")
 prediction = load_clf.predict(input_df)
 
 st.subheader('Prediction')
 st.write(prediction)
-
